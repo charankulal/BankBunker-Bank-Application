@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class AccountServiceImpl implements AccountService {
 
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
     public AccountServiceImpl(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
@@ -29,5 +29,14 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto getAccountById(Long id) {
         Account account=accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account does not exist"));
         return AccountMapper.mapToAccountDto(account);
+    }
+
+    @Override
+    public AccountDto deposit(Long id, double amount) {
+        Account account=accountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account does not exist"));
+        double total=account.getBalance()+ amount;
+        account.setBalance(total);
+        Account savedAccount=accountRepository.save(account);
+        return AccountMapper.mapToAccountDto(savedAccount);
     }
 }
